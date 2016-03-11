@@ -11,9 +11,36 @@ from downloadaudio.field_data import JapaneseFieldData
 from downloadaudio.download import do_download
 from downloadaudio.downloaders import downloaders
 
+import signal
+
+
+def timeout(func, args=(), kwargs={}, timeout_duration=10, default=None):
+    import signal
+
+    class TimeoutError(Exception):
+        pass
+
+    def handler(signum, frame):
+        raise TimeoutError()
+
+    # set the timeout handler
+    signal.signal(signal.SIGALRM, handler)
+    signal.alarm(timeout_duration)
+    try:
+        result = func(*args, **kwargs)
+    except TimeoutError as exc:
+        print("Timeout!")
+        result = default
+    finally:
+        signal.alarm(0)
+
+    return result
+
 def get_path_to_audio(word):
     retrieved_entries = []
-    field_data = JapaneseFieldData("onyomi", "sound", romkan.to_hiragana(word))
+    hiragana = romkan.to_hiragana(word)
+    field_data = JapaneseFieldData("onyomi", "sound", hiragana)
+    field_data.word = u""
     for dloader in downloaders:
         # Use a public variable to set the language.
         dloader.language = "ja"
@@ -32,7 +59,6 @@ def get_path_to_audio(word):
         retrieved_entries += dloader.downloads_list
     file_paths = []
     for entry in retrieved_entries:
-        print "Processing", entry
         entry.process()
         file_paths.append(entry.file_path)
     return file_paths
@@ -53,7 +79,6 @@ class ReadingsAudio():
             if field in note.keys():
                 if note[field].strip(): print(note[field])
                 readings.extend(self.split_readings(note[field]))
-        print(readings)
         for reading in readings:
             if reading in self.audio_paths:
                 continue
@@ -73,7 +98,6 @@ class ReadingsAudio():
         """
         regex = '|'.join(map(re.escape, self.readings_delimeters))
         splitted = re.split(regex, string)
-        print("splitted", splitted)
         kana_only = [''.join(re.findall(u"[\u3040-\u30ff]", split)) for split in splitted]
         no_whitespace = [kana.strip() for kana in kana_only if kana.strip()]
         return [str(romkan.to_hepburn(kana)) for kana in no_whitespace]
@@ -91,15 +115,13 @@ class ReadingsAudio():
 
     def try_downloading_audio(self):
         for word in self.missing_audio:
-            print word
-            print(get_path_to_audio(word))
-
+            paths = timeout(get_path_to_audio, args=[word])
+            print word, paths
 
 def run():
     ra = ReadingsAudio()
     ra.process_all()
     ra.try_downloading_audio()
-
 
 def setup_menu(browser):
     a = QAction("Sync readings Audio", browser)
