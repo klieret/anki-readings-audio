@@ -6,6 +6,36 @@ from aqt.qt import QAction, SIGNAL
 from aqt import mw
 import re
 import romkan
+# todo: use try/except
+from downloadaudio.field_data import JapaneseFieldData
+from downloadaudio.download import do_download
+from downloadaudio.downloaders import downloaders
+
+def get_path_to_audio(word):
+    retrieved_entries = []
+    field_data = JapaneseFieldData("onyomi", "sound", romkan.to_hiragana(word))
+    for dloader in downloaders:
+        # Use a public variable to set the language.
+        dloader.language = "ja"
+        try:
+            # print("Testing", dloader)
+            # Make it easer inside the downloader. If anything
+            # goes wrong, don't catch, or raise whatever you want.
+            dloader.download_files(field_data)
+        except:
+            #  # Uncomment this raise while testing a new
+            #  # downloaders.  Also use the “For testing”
+            #  # downloaders list with your downloader in
+            #  # downloaders.__init__
+            raise
+            continue
+        retrieved_entries += dloader.downloads_list
+    file_paths = []
+    for entry in retrieved_entries:
+        print "Processing", entry
+        entry.process()
+        file_paths.append(entry.file_path)
+    return file_paths
 
 
 class ReadingsAudio():
@@ -14,14 +44,21 @@ class ReadingsAudio():
         self.reading_fields = ["kunyomi", "onyomi"]
         self.missing_audio = []
         self.audio_paths = {}
-        self.readings_delimeters = [',']
+        # important: do include japanese version of ',' etc.!
+        self.readings_delimeters = [u',', u"、", u';']
 
     def process_single(self, note):
         readings = []
         for field in self.reading_fields:
             if field in note.keys():
+                if note[field].strip(): print(note[field])
                 readings.extend(self.split_readings(note[field]))
         print(readings)
+        for reading in readings:
+            if reading in self.audio_paths:
+                continue
+            else:
+                self.missing_audio.append(reading)
 
     def split_readings(self, string):
         """ Takes input string and does 5 things:
@@ -36,6 +73,7 @@ class ReadingsAudio():
         """
         regex = '|'.join(map(re.escape, self.readings_delimeters))
         splitted = re.split(regex, string)
+        print("splitted", splitted)
         kana_only = [''.join(re.findall(u"[\u3040-\u30ff]", split)) for split in splitted]
         no_whitespace = [kana.strip() for kana in kana_only if kana.strip()]
         return [str(romkan.to_hepburn(kana)) for kana in no_whitespace]
@@ -48,11 +86,19 @@ class ReadingsAudio():
                 card = mw.col.getCard(nid)
                 note = card.note()
                 self.process_single(note)
+        self.missing_audio = list(set(self.missing_audio))
+        print(self.missing_audio)
+
+    def try_downloading_audio(self):
+        for word in self.missing_audio:
+            print word
+            print(get_path_to_audio(word))
 
 
 def run():
     ra = ReadingsAudio()
     ra.process_all()
+    ra.try_downloading_audio()
 
 
 def setup_menu(browser):
