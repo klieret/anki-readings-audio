@@ -9,31 +9,33 @@ import time
 from .audiocollection import AudioCollection
 
 
-def guilt_audio_field_entry_from_path(path):
+def get_audio_field_entry_from_path(path):
     # Entry looks like this: '[sound:帰還_きかん.mp3]'
     return u"[sound:{}]".format(path)
 
 
-def get_audio_field_entries_from_field(field_string):
-    regex = re.compile("\[sound:[^\[\]]*\]")
-    return regex.findall(field_string)
+def get_paths_from_audio_field(audio_field):
+    regex = re.compile("\[sound:([^\[\]]*)\]")
+    return regex.findall(audio_field)
 
 
-def extend_audio_field_entry(old_field_string, new_paths, remove_duplicates=True, new_entries_first=False):
+def extend_audio_field(old_field_string, new_paths, remove_duplicates=True, new_entries_first=False):
     # convert both inputs to lists of strings [sound:....]
-    old_entries = get_audio_field_entries_from_field(old_field_string)
-    new_entries = [guilt_audio_field_entry_from_path(path) for path in new_paths]
-    # remove duplicates:
+    old_paths = get_paths_from_audio_field(old_field_string)
+    # remove duplicated paths:
     if remove_duplicates:
-        for entry in old_entries:
-            if entry in new_entries:
-                # remove entry (even if occuring multiple times)
-                new_entries = [item for item in new_entries if item != entry]
+        for old_path in old_paths:
+            if old_path in new_paths:
+                # remove paths (even if occuring multiple times)
+                new_entries = [path for path in new_paths if path != old_path]
+    # build audio field entries:
+    new_audio_field_entries = [get_audio_field_entry_from_path(path) for path in new_paths]
+    old_audio_field_entries = [get_audio_field_entry_from_path(path) for path in old_paths]
     # return in right order:
     if new_entries_first:
-        return ''.join(new_entries) + ''.join(old_entries)
+        return ''.join(new_audio_field_entries) + ''.join(old_audio_field_entries)
     else:
-        return ''.join(old_entries) + ''.join(new_entries)
+        return ''.join(old_audio_field_entries) + ''.join(new_audio_field_entries)
 
 
 class ReadingsAudio():
