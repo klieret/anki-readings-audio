@@ -23,7 +23,7 @@ def get_audio_entries(reading, timeout=10):
     :param timeout: timeout time in seconds
     :return: a list of download entries (type name: DownloadEntry)
     """
-    return timeout_wrap(get_audio_entries, args=[reading], timeout=timeout)
+    return timeout_wrap(_get_audio_entries, args=[reading], timeout=timeout)
 
 
 def _get_audio_entries(reading):

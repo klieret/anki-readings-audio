@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# todo: signal might not work under windows
+# todo: signal will not work under windows
 import signal
 
 
@@ -46,11 +46,10 @@ def timeout_wrap(func, args=None, kwargs=None, timeout=10):
     if not kwargs:
         kwargs = {}
 
-    def _handler(signum, frame):
-        raise TimeoutError()
+    def handler(signum, frame):
+        raise TimeoutError
 
-    # set the timeout handler
-    signal.signal(signal.SIGALRM, _handler)
+    signal.signal(signal.SIGALRM, handler)
     signal.alarm(timeout)
 
     try:
@@ -58,6 +57,21 @@ def timeout_wrap(func, args=None, kwargs=None, timeout=10):
     except TimeoutError:
         raise RuntimeError
     else:
-        return ret
-    finally:
+        # deactivate alarm
         signal.alarm(0)
+        return ret
+
+
+if __name__ == "__main__":
+    # testing timeout function
+
+    import time
+
+    def test_successfull():
+        time.sleep(1)
+
+    def test_unsuccessfull():
+        time.sleep(5)
+
+    timeout_wrap(test_successfull, timeout=3)
+    timeout_wrap(test_unsuccessfull, timeout=3)

@@ -46,6 +46,7 @@ def extend_audio_field(old_audio_field, new_paths, do_remove_duplicates=True, ne
     :param overwrite: completely ignore old_audio_field
     :return: New string for the audio field
     """
+    print(new_paths)
     if overwrite:
         old_audio_field = ""
 
@@ -55,6 +56,7 @@ def extend_audio_field(old_audio_field, new_paths, do_remove_duplicates=True, ne
     # normalise paths
     new_paths = [os.path.normpath(path) for path in new_paths]
     old_paths = [os.path.normpath(path) for path in old_paths]
+    print(new_paths, old_paths)
 
     # remove duplicated paths:
     if do_remove_duplicates:
@@ -64,9 +66,13 @@ def extend_audio_field(old_audio_field, new_paths, do_remove_duplicates=True, ne
         # remove intersection:
         new_paths = remove_intersection(old_paths, new_paths)
 
+    print(new_paths, old_paths)
+
     # build audio field entries:
     new_audio_field_entries = [get_audio_field_entry_from_path(path) for path in new_paths]
     old_audio_field_entries = [get_audio_field_entry_from_path(path) for path in old_paths]
+
+    print(new_audio_field_entries, old_audio_field_entries)
 
     # return them in right order:
     if new_entries_first:
