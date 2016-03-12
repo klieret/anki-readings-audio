@@ -10,7 +10,7 @@ from .anki_api import ReadingsAudio
 def run():
     ra = ReadingsAudio()
     ra.process_all()
-    ra.try_downloading_audio()
+    # ra.try_downloading_audio()
 
 
 def setup_menu(browser):

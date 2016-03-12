@@ -6,6 +6,34 @@ import re
 import romkan
 from .downloader_api import get_audio_entries
 import time
+from .audiocollection import AudioCollection
+
+
+def guilt_audio_field_entry_from_path(path):
+    # Entry looks like this: '[sound:帰還_きかん.mp3]'
+    return u"[sound:{}]".format(path)
+
+
+def get_audio_field_entries_from_field(field_string):
+    regex = re.compile("\[sound:[^\[\]]*\]")
+    return regex.findall(field_string)
+
+
+def extend_audio_field_entry(old_field_string, new_paths, remove_duplicates=True, new_entries_first=False):
+    # convert both inputs to lists of strings [sound:....]
+    old_entries = get_audio_field_entries_from_field(old_field_string)
+    new_entries = [guilt_audio_field_entry_from_path(path) for path in new_paths]
+    # remove duplicates:
+    if remove_duplicates:
+        for entry in old_entries:
+            if entry in new_entries:
+                # remove entry (even if occuring multiple times)
+                new_entries = [item for item in new_entries if item != entry]
+    # return in right order:
+    if new_entries_first:
+        return ''.join(new_entries) + ''.join(old_entries)
+    else:
+        return ''.join(old_entries) + ''.join(new_entries)
 
 
 class ReadingsAudio():
@@ -13,21 +41,37 @@ class ReadingsAudio():
         self.target_decks = ["KANJI::readings"]
         self.reading_fields = ["kunyomi", "onyomi"]
         self.missing_audio = []
-        self.audio_paths = {}
+        self.audio_collection = AudioCollection()
+        self.audio_collection.scan()
         # important: do include japanese version of ',' etc.!
         self.readings_delimeters = [u',', u"、", u';']
 
-    def process_single(self, note):
+    def process_single(self, note, download=False, add=True, overwrite=True):
+        """Processes single note.
+        :param note: The note.
+        :param download: Download missing audio.
+        :param add: Add the audio to the audio field on the note.
+        :param overwrite: Overwrite audio field (else extend it, while leaving out duplicates)
+        :return: None
+        """
         readings = []
+        audio_paths = []
         for field in self.reading_fields:
             if field in note.keys():
-                if note[field].strip(): print(note[field])
                 readings.extend(self.split_readings(note[field]))
         for reading in readings:
-            if reading in self.audio_paths:
-                continue
+            if reading in self.audio_collection:
+                audio_paths.append(self.audio_collection[reading])
             else:
-                self.missing_audio.append(reading)
+                if download:
+                    # todo
+                    pass
+                else:
+                    self.missing_audio.append(reading)
+        if add:
+            for audio_path in audio_paths:
+                # todo
+                pass
 
     def split_readings(self, string):
         """ Takes input string and does 5 things:
@@ -40,6 +84,8 @@ class ReadingsAudio():
         :param string: Input string, containing readings as hiragana/katakana, separated by delimters.
         :return: List of the readings.
         """
+        # since we are splitting with respect to multiple delimeters (e.g. ',', ';' etc.)
+        # build the regex ",|;|..." etc. and use re..split to do the splitting.
         regex = '|'.join(map(re.escape, tuple(self.readings_delimeters)))
         splitted = re.split(regex, string)
         kana_only = [''.join(re.findall(u"[\u3040-\u30ff]", split)) for split in splitted]
