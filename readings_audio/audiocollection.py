@@ -42,6 +42,7 @@ class AudioCollection(object):
             raise ValueError
         return "raudio_" + reading
 
+    # todo: add total number of audio entries. remember to adapt self.get_reading_from_name
     def dupe_proof_names(self, dl_entries, reading):
         """ Does the following:
          1. Use _name() to get preliminary names

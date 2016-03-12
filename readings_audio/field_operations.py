@@ -32,18 +32,23 @@ def get_paths_from_audio_field(audio_field):
     return regex.findall(audio_field)
 
 
-def extend_audio_field(old_audio_field, new_paths, do_remove_duplicates=True, new_entries_first=False):
+def extend_audio_field(old_audio_field, new_paths, do_remove_duplicates=True, new_entries_first=False, overwrite=False):
     """ Takes the content of an audio field and extends it with paths for more audio files.
     Furthermore:
     1. Any text in between audio field entries is removed
     2. The paths to the audio files are normalized
     3. Duplicates are removed if do_remove_duplicates == True
+    4. The entries from old_audio field are completely neglected if overwrite == True
     :param old_audio_field: The content of the old audio field.
     :param new_paths: Paths to audio files that we want to add to the audio field.
     :param do_remove_duplicates: Do we want to remove duplicate entries?
     :param new_entries_first: Should the new entries (possibly with removed duplicates)
+    :param overwrite: completely ignore old_audio_field
     :return: New string for the audio field
     """
+    if overwrite:
+        old_audio_field = ""
+
     # convert both inputs to lists of strings [sound:....]
     old_paths = get_paths_from_audio_field(old_audio_field)
 
