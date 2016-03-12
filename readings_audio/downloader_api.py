@@ -1,17 +1,21 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# todo: use try/except
-from downloadaudio.field_data import JapaneseFieldData
-from downloadaudio.downloaders import downloaders
+try:
+    from downloadaudio.field_data import JapaneseFieldData
+    from downloadaudio.downloaders import downloaders
+except ImportError:
+    # Abort. Anki will catch this and display the error message.
+    raise ImportError("The addon readings_audio needs the addon downloadaudio to be installed!")
+
 import time
 import signal
+
+# todo: really neccessary?
 import romkan
 
 
-def timeout(func, args=(), kwargs={}, timeout_duration=10, default=None):
-    import signal
-
+def timeout_wrap(func, args=(), kwargs={}, timeout=10):
     class TimeoutError(Exception):
         pass
 
@@ -20,23 +24,21 @@ def timeout(func, args=(), kwargs={}, timeout_duration=10, default=None):
 
     # set the timeout handler
     signal.signal(signal.SIGALRM, handler)
-    signal.alarm(timeout_duration)
+    signal.alarm(timeout)
+
     try:
-        result = func(*args, **kwargs)
-    except TimeoutError as exc:
-        print("Timeout!")
-        result = default
+        return func(*args, **kwargs)
+    except TimeoutError:
+        raise RuntimeError
     finally:
         signal.alarm(0)
 
-    return result
+
+def get_audio_entries(word, timeout=10):
+    return timeout_wrap(get_audio_entries, args=[word], timeout=timeout)
 
 
-def get_path_to_audio(word):
-    return timeout(get_path_to_audio, args=[word], timeout_duration=10)
-
-
-def _get_path_to_audio(word):
+def _get_audio_entries(word):
     retrieved_entries = []
     hiragana = romkan.to_hiragana(word)
     field_data = JapaneseFieldData("", "", hiragana)
@@ -47,8 +49,4 @@ def _get_path_to_audio(word):
         except:
             continue
         retrieved_entries += dloader.downloads_list
-    file_paths = []
-    for entry in retrieved_entries:
-        entry.process()
-        file_paths.append(entry.file_path)
-    return file_paths
+    return retrieved_entries

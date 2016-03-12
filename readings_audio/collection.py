@@ -6,17 +6,16 @@ import os.path
 import os
 import shutil
 import collections
+from downloader_api import get_audio_entries
 
 
 class Collection(object):
     def __init__(self, media_dir=None):
-        if not self.media_dir:
+        if not media_dir:
             from aqt import mw
-            self.media_dir = mw.col.media.dir()
+            media_dir = mw.col.media.dir()
+        self.media_dir = media_dir
         self.content = collections.defaultdict(list)  # structure: syllable: [reading: [path1, path2,...]]
-
-    def _move_download(self, dl_path, name):
-        pass
 
     @staticmethod
     def get_reading_from_name(path):
@@ -28,12 +27,13 @@ class Collection(object):
         :return: (reading, number)
         """
         base = os.path.splitext(os.path.basename(path))[0]
-        assert base.startswith("raudio_")
+        if not base.startswith("raudio_"):
+            raise ValueError
         # of course throws an exception if more than 1 '_' left
         # (feature not a bug)
         reading, number = base.replace("raudio_", "").split('_')
-        assert reading.isalpha()
-        assert number.isdigit()
+        if not reading.isalpha() and number.isdigit():
+            raise ValueError
         return reading, number
 
     @staticmethod
@@ -63,8 +63,19 @@ class Collection(object):
                     duplicates += 1
         return dl_entries
 
-    def download(self, word):
-        pass
+    def download(self, reading):
+        # return number of downloaded items
+        try:
+            entries = self.dupe_proof_names(get_audio_entries(reading), reading)
+        except:
+            return 0
+        # delete previos entries
+        self.content[reading] = []
+        for entry in entries:
+            new_path = os.path.join(self.media_dir, entry.base_name + entry.file_extension)
+            # overwrites exting files!
+            shutil.move(entry.file_path, new_path)
+            self.content[reading].append(os.path.basename(new_path))
 
     def scan(self):
         file_names = os.listdir(self.media_dir)
@@ -86,3 +97,9 @@ class Collection(object):
 
     def __getitem__(self, item):
         return self.content[item]
+
+
+if __name__ == "__main__":
+    # for testing purposes
+    c = Collection(media_dir=os.path.expanduser("~/Anki/fuchurMain/collection.media"))
+    c.scan()

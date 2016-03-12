@@ -5,7 +5,7 @@ from aqt.qt import *
 from aqt import mw
 import re
 import romkan
-from .downloader_api import get_path_to_audio
+from .downloader_api import get_audio_entries
 import time
 
 class ReadingsAudio():
@@ -71,6 +71,6 @@ class ReadingsAudio():
 
     def try_downloading_audio(self, gui=True):
         for word in self.missing_audio:
-            paths = get_path_to_audio(word)
+            paths = get_audio_entries(word)
             print word, paths
             time.sleep(2)
