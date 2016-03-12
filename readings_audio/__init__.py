@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+#from .progress_bar import progress_bar
 from anki.hooks import addHook
-from aqt.qt import QAction, SIGNAL
+from aqt.qt import *
 from aqt import mw
 import re
 import romkan
@@ -10,6 +11,7 @@ import romkan
 from downloadaudio.field_data import JapaneseFieldData
 from downloadaudio.download import do_download
 from downloadaudio.downloaders import downloaders
+import time
 
 import signal
 
@@ -39,22 +41,14 @@ def timeout(func, args=(), kwargs={}, timeout_duration=10, default=None):
 def get_path_to_audio(word):
     retrieved_entries = []
     hiragana = romkan.to_hiragana(word)
-    field_data = JapaneseFieldData("onyomi", "sound", hiragana)
-    field_data.word = u""
+    field_data = JapaneseFieldData("", "", hiragana)
+    # field_data.word = u""
     for dloader in downloaders:
         # Use a public variable to set the language.
         dloader.language = "ja"
         try:
-            # print("Testing", dloader)
-            # Make it easer inside the downloader. If anything
-            # goes wrong, don't catch, or raise whatever you want.
             dloader.download_files(field_data)
         except:
-            #  # Uncomment this raise while testing a new
-            #  # downloaders.  Also use the “For testing”
-            #  # downloaders list with your downloader in
-            #  # downloaders.__init__
-            raise
             continue
         retrieved_entries += dloader.downloads_list
     file_paths = []
@@ -96,32 +90,47 @@ class ReadingsAudio():
         :param string: Input string, containing readings as hiragana/katakana, separated by delimters.
         :return: List of the readings.
         """
-        regex = '|'.join(map(re.escape, self.readings_delimeters))
+        regex = '|'.join(map(re.escape, tuple(self.readings_delimeters)))
         splitted = re.split(regex, string)
         kana_only = [''.join(re.findall(u"[\u3040-\u30ff]", split)) for split in splitted]
         no_whitespace = [kana.strip() for kana in kana_only if kana.strip()]
         return [str(romkan.to_hepburn(kana)) for kana in no_whitespace]
 
-    def process_all(self):
+    def process_all(self, gui=True):
+        nids = []
         for deck in self.target_decks:
-            nids = mw.col.findCards("deck:%s" % deck)
-            print("%d nids" % len(nids))
-            for nid in nids:
-                card = mw.col.getCard(nid)
-                note = card.note()
-                self.process_single(note)
+            nids += mw.col.findCards("deck:%s" % deck)
+        print "There's a total of %d notes." % len(nids)
+
+        # if gui:
+        #     dialog, pb = progress_bar(len(nids))
+
+        for num, nid in enumerate(nids):
+            # if gui:
+            #     pb.setValue(num)
+            card = mw.col.getCard(nid)
+            note = card.note()
+            self.process_single(note)
+
+        # if gui:
+        #     dialog.destroy()
+
+        # remove duplicates
         self.missing_audio = list(set(self.missing_audio))
         print(self.missing_audio)
 
-    def try_downloading_audio(self):
+    def try_downloading_audio(self, gui=True):
         for word in self.missing_audio:
             paths = timeout(get_path_to_audio, args=[word])
             print word, paths
+            time.sleep(2)
+
 
 def run():
     ra = ReadingsAudio()
     ra.process_all()
     ra.try_downloading_audio()
+
 
 def setup_menu(browser):
     a = QAction("Sync readings Audio", browser)
