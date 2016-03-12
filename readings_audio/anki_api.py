@@ -6,7 +6,7 @@ import romkan
 from .downloader_api import get_audio_entries
 import time
 from .audiocollection import AudioCollection
-
+from .field_operations import split_readings
 
 
 class ReadingsAudio():
@@ -30,7 +30,7 @@ class ReadingsAudio():
         audio_paths = []
         for field in self.reading_fields:
             if field in note.keys():
-                readings.extend(self.split_readings(note[field]))
+                readings.extend(split_readings(note[field]))
         for reading in readings:
             if reading in self.audio_collection:
                 audio_paths.append(self.audio_collection[reading])
