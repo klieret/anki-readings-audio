@@ -2,15 +2,16 @@
 # -*- coding: utf-8 -*-
 
 from anki.hooks import addHook
-from aqt.qt import *
-from aqt import mw
+from aqt.qt import QAction, SIGNAL
 
 from .anki_api import ReadingsAudio
+
 
 def run():
     ra = ReadingsAudio()
     ra.process_all()
     ra.try_downloading_audio()
+
 
 def setup_menu(browser):
     a = QAction("Sync readings Audio", browser)

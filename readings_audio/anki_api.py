@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from aqt.qt import *
 from aqt import mw
 import re
 import romkan
 from .downloader_api import get_audio_entries
 import time
+
 
 class ReadingsAudio():
     def __init__(self):

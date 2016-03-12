@@ -9,7 +9,7 @@ import collections
 from downloader_api import get_audio_entries
 
 
-class Collection(object):
+class AudioCollection(object):
     def __init__(self, media_dir=None):
         if not media_dir:
             from aqt import mw
@@ -101,5 +101,5 @@ class Collection(object):
 
 if __name__ == "__main__":
     # for testing purposes
-    c = Collection(media_dir=os.path.expanduser("~/Anki/fuchurMain/collection.media"))
+    c = AudioCollection(media_dir=os.path.expanduser("~/Anki/fuchurMain/collection.media"))
     c.scan()
