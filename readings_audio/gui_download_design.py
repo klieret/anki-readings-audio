@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'download.ui'
+# Form implementation generated from reading ui file 'gui_download_design.ui'
 #
-# Created: Sun Mar 13 02:52:58 2016
+# Created: Sun Mar 13 12:26:45 2016
 #      by: PyQt4 UI code generator 4.9.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -39,7 +39,7 @@ class Ui_Dialog(object):
         sizePolicy.setHeightForWidth(self.label_3.sizePolicy().hasHeightForWidth())
         self.label_3.setSizePolicy(sizePolicy)
         self.label_3.setText(_fromUtf8(""))
-        self.label_3.setPixmap(QtGui.QPixmap(_fromUtf8("1457825795_Record-Player.png")))
+        self.label_3.setPixmap(QtGui.QPixmap(_fromUtf8("icon.png")))
         self.label_3.setScaledContents(False)
         self.label_3.setObjectName(_fromUtf8("label_3"))
         self.horizontalLayout_4.addWidget(self.label_3)
@@ -53,6 +53,7 @@ class Ui_Dialog(object):
         self.label_4.setObjectName(_fromUtf8("label_4"))
         self.verticalLayout.addWidget(self.label_4)
         self.checkBox_add_media = QtGui.QCheckBox(Dialog)
+        self.checkBox_add_media.setChecked(True)
         self.checkBox_add_media.setObjectName(_fromUtf8("checkBox_add_media"))
         self.verticalLayout.addWidget(self.checkBox_add_media)
         self.horizontalLayout_2 = QtGui.QHBoxLayout()
@@ -60,6 +61,7 @@ class Ui_Dialog(object):
         spacerItem = QtGui.QSpacerItem(20, 20, QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Minimum)
         self.horizontalLayout_2.addItem(spacerItem)
         self.radioButton_extend = QtGui.QRadioButton(Dialog)
+        self.radioButton_extend.setChecked(True)
         self.radioButton_extend.setObjectName(_fromUtf8("radioButton_extend"))
         self.horizontalLayout_2.addWidget(self.radioButton_extend)
         self.radioButton_overwrite = QtGui.QRadioButton(Dialog)
@@ -70,6 +72,7 @@ class Ui_Dialog(object):
         self.horizontalLayout_2.addWidget(self.radioButton_overwrite_empty)
         self.verticalLayout.addLayout(self.horizontalLayout_2)
         self.checkBox_download_missing = QtGui.QCheckBox(Dialog)
+        self.checkBox_download_missing.setChecked(True)
         self.checkBox_download_missing.setObjectName(_fromUtf8("checkBox_download_missing"))
         self.verticalLayout.addWidget(self.checkBox_download_missing)
         self.horizontalLayout_3 = QtGui.QHBoxLayout()
