@@ -32,7 +32,7 @@ def get_paths_from_audio_field(audio_field):
     return regex.findall(audio_field)
 
 
-def extend_audio_field(old_audio_field, new_paths, mode):
+def extend_audio_field(old_audio_field, new_paths, mode, media_dir=None):
     """ Takes the content of an audio field and extends it with paths for more audio files.
     Furthermore:
     1. Any text in between audio field entries is removed
@@ -42,14 +42,15 @@ def extend_audio_field(old_audio_field, new_paths, mode):
     :param old_audio_field: The content of the old audio field.
     :param new_paths: Paths to audio files that we want to add to the audio field.
     :param mode: AddMode Containing options
+    :param media_dir: Nescessary if we are checking for broken links.
     :return: New string for the audio field
     """
 
     if not mode.enabled:
         raise ValueError
 
-    if mode.remove_broken:
-        raise NotImplementedError
+    if mode.remove_broken and not media_dir:
+        raise ValueError
 
     # convert both inputs to lists of strings [sound:....]
     old_paths = get_paths_from_audio_field(old_audio_field)
@@ -57,6 +58,9 @@ def extend_audio_field(old_audio_field, new_paths, mode):
     # normalise paths
     new_paths = [os.path.normpath(path) for path in new_paths]
     old_paths = [os.path.normpath(path) for path in old_paths]
+
+    if mode.remove_broken:
+        old_paths = [path for path in old_paths if os.path.exists(os.path.join(media_dir, path))]
 
     # remove duplicated paths:
     # 1. remove internal duplicates:

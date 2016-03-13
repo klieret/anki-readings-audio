@@ -8,6 +8,8 @@ from anki_api import *
 from PyQt4.QtCore import QThread, SIGNAL
 
 # todo: quit should properly close thread & Co....
+# todo: after start was hit one, application freezes once start is hit again
+# todo: please, please cleanup this mess
 
 class RunMethodThread(QThread):
     def __init__(self, obj, method_name, *args, **kwargs):
@@ -61,20 +63,33 @@ class MainGui(MainGuiNoAnki):
         self.main_thread = None
         self.pushButton_stop.clicked.connect(self.stop)
 
-
-
     def stop(self):
         self.main_thread.stop = True
 
 
     def get_mode(self):
         add_mode = AddMode()
-        add_mode.set_defaults()
+        add_mode.enabled = self.checkBox_add_media.isChecked()
+        add_mode.remove_broken = self.checkBox_remove_broken.isChecked()
+        add_mode.new_first = False
+
+        if self.radioButton_extend.isChecked():
+            add_mode.mode = "extend"
+        elif self.radioButton_overwrite.isChecked():
+            add_mode.mode = "overwrite"
+        elif self.radioButton_overwrite_empty.isChecked():
+            add_mode.mode = "overwrite_empty"
+        else:
+            raise ValueError
+
         download_mode = DownloadMode()
-        download_mode.set_defaults()
-        download_mode.enabled = True
+        download_mode.enabled = self.checkBox_download_missing.isChecked()
+        download_mode.ignore_blacklist = self.checkBox_ignore_blacklist.isChecked()
+        download_mode.ignore_redownload = self.checkBox_redownload.isChecked()
+
         mode = CrawlingMode(add_mode, download_mode)
         mode.check_options()
+
         return mode
 
     def run(self):
@@ -122,13 +137,9 @@ class MainGui(MainGuiNoAnki):
 
         self.label_status.setText("Status: Main Queue")
 
-        print("building next thread")
         self.main_thread = MainThread(self.crawler, mode, notes)
-        print 2
         self.connect(self.main_thread, SIGNAL("finished()"), self.all_finished)
-        print 3
         self.connect(self.main_thread, SIGNAL("update_progress()"), self.update_progress)
-        print 4
         self.main_thread.start()
         print("main tjread dispatched")
 
@@ -156,7 +167,6 @@ class MainGui(MainGuiNoAnki):
         self.progressBar.reset()
 
         # def run_(self):
-        #     # todo: maybe inherit from top class. also use threading
         #     # something like threading=False
         #     self.label_status.setText("Status: Running...")
         #
@@ -196,7 +206,6 @@ class MainGui(MainGuiNoAnki):
     def update_progress(self):
         self.progressBar.setEnabled(True)
         self.progressBar.setValue(self.main_thread.num)
-        print(progress_bar_text(self.progressBar))
         self.progressBar.setFormat(progress_bar_text(self.progressBar))
         self.tableWidget.setEnabled(True)
         keys_in_order = ["total_notes", "total_audio_files", "missing_audio", "newly_downloaded", "failed_to_download"]
@@ -208,7 +217,6 @@ class MainGui(MainGuiNoAnki):
 
         # def batch_process_all(self, mode):
 
-        # todo: threading and everything
         # self.label_status.setText("Status: Scanning Media Collection.")
         # thread = ScanMediaThread(self.crawler)
         # self.crawler.audio_collection.scan()

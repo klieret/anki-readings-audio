@@ -69,7 +69,8 @@ class AnkiCrawler(object):
                     logger.debug(u"Extended with sound files {}".format(self.audio_collection[reading][0]))
 
             if new_paths:
-                note[self.audio_field] = extend_audio_field(note[self.audio_field], new_paths, add_mode)
+                note[self.audio_field] = extend_audio_field(note[self.audio_field], new_paths, add_mode,
+                                                            self.audio_collection.media_dir)
             if do_flush:
                 # we can't flush inside of a thread, that's why we need to postpone flush sometimes
                 note.flush()
