@@ -35,9 +35,13 @@ class MainThread(QThread):
         self.notes = notes
         self.mode = mode
         self.num = 0
+        self.stop = False
 
     def run(self):
         for num, note in enumerate(self.notes):
+            if self.stop:
+                print("abort")
+                self.terminate()
             print("note", num)
             self.num = num
             self.crawler.update_statistics()
@@ -55,6 +59,12 @@ class MainGui(MainGuiNoAnki):
         self.crawler = None
         self.scan_thread = None
         self.main_thread = None
+        self.pushButton_stop.clicked.connect(self.stop)
+
+
+
+    def stop(self):
+        self.main_thread.stop = True
 
 
     def get_mode(self):
@@ -68,6 +78,7 @@ class MainGui(MainGuiNoAnki):
         return mode
 
     def run(self):
+        self.stop = False
         # can't abort anyway
         self.pushButton_start.setEnabled(False)
         self.pushButton_stop.setEnabled(False)

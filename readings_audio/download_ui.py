@@ -64,11 +64,8 @@ class MainGuiNoAnki(QtGui.QWidget, gui_download_design.Ui_crawler_dialog):
             box.clicked.connect(self.box_implications)
 
         self.pushButton_start.clicked.connect(self.run)
-        self.pushButton_stop.clicked.connect(self.stop)
-        self.stop = False
 
-    def stop(self):
-        self.stop = True
+
 
     def run(self):
         self.progressBar.setRange(0, 0)
@@ -82,7 +79,6 @@ class MainGuiNoAnki(QtGui.QWidget, gui_download_design.Ui_crawler_dialog):
         self.progressBar.setRange(0, 1)
 
     def run_2(self):
-        self.stop = False # todo
         self.label_status.setText("Status: Running...")
 
         self.progressBar.setEnabled(True)
