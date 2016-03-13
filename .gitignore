@@ -1,3 +1,4 @@
+*.pyc
 .idea/**
 standalone_tests/**
 unused_icons/**

@@ -16,52 +16,7 @@ sh = logging.StreamHandler(stream=sys.stdout)
 sh.setLevel(logging.DEBUG)
 logger.addHandler(sh)
 logger.setLevel(logging.DEBUG)
-
-class AddMode(object):
-    def __init__(self):
-        self.option_names = ["enabled", "mode", "remove_broken", "new_first"]
-        # set all options to None
-        for option in self.option_names:
-            self.__setattr__(option, None)
-
-    def set_defaults(self):
-        self.enabled = True
-        self.mode = "extend"  # options: extend, overwrite, overwrite_empty
-        self.remove_broken = False # todo: not yet implemented
-        self.new_first = False
-
-    def check_options(self):
-        for option in self.option_names:
-            if self.__getattribute__(option) is None:
-                raise ValueError
-        if self.add_mode not in ["extend", "overwrite", "overwrite_empty"]:
-            raise ValueError
-
-class DownloadMode(object):
-    def __init__(self):
-        self.option_names = ["enabled", "ignore_blacklist", "ignore_redownload"]
-        # set all options to None
-        for option in self.option_names:
-            self.__setattr__(option, None)
-
-    def set_defaults(self):
-        self.enabled = True
-        self.ignore_blacklist = False
-        self.ignore_redownload = False
-
-    def check_options(self):
-        for option in self.option_names:
-            if self.__getattribute__(option) is None:
-                raise ValueError
-
-class CrawlingMode(object):
-    def __init__(self, add_mode=AddMode(), download_mode=DownloadMode()):
-        self.add = add_mode
-        self.download = download_mode
-
-    def check_options(self):
-        self.add.check_options()
-        self.download.check_options()
+from .modes import *
 
 
 class ReadingsAudio(object):
@@ -108,8 +63,7 @@ class ReadingsAudio(object):
                     logger.warning("Still missing audio for reading {}".format(reading))
             print(new_paths)
             if new_paths:
-                note[self.audio_field] = extend_audio_field(note[self.audio_field], new_paths,
-                                                            mode.add)  # todo: update!
+                note[self.audio_field] = extend_audio_field(note[self.audio_field], new_paths, mode.add)
             note.flush()
         # todo: return note? or something?
 
