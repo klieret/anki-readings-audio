@@ -72,9 +72,9 @@ class MainGuiNoAnki(QtGui.QWidget, gui_download_design.Ui_crawler_dialog):
 
     def run(self):
         self.progressBar.setRange(0, 0)
-        self.thread = Unsplittable(time.sleep, 10)
-        self.connect(self.thread, SIGNAL("finished()"), self.unsplittable_finished)
-        self.thread.start()
+        self.scan_thread = Unsplittable(time.sleep, 10)
+        self.connect(self.scan_thread, SIGNAL("finished()"), self.unsplittable_finished)
+        self.scan_thread.start()
         # print "exited run"
 
     def unsplittable_finished(self):
@@ -128,7 +128,8 @@ class MainGuiNoAnki(QtGui.QWidget, gui_download_design.Ui_crawler_dialog):
     def box_implications(self):
         for radio_button in self.add_dependant_boxes:
             radio_button.setEnabled(self.checkBox_add_media.isChecked())
-        if self.radioButton_extend.isChecked():
+
+        if self.radioButton_extend.isChecked() and self.radioButton_extend.isEnabled():
             self.checkBox_remove_broken.setEnabled(True)
         else:
             self.checkBox_remove_broken.setChecked(True)

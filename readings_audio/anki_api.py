@@ -58,7 +58,7 @@ class AnkiCrawler(object):
                     logger.debug("Reading {} is missing.".format(reading))
                     self.missing_audio.add(reading)
 
-    def process_add(self, note, readings, add_mode):
+    def process_add(self, note, readings, add_mode, do_flush = True):
         # possibly add new audio files
         if add_mode.enabled:
             new_paths = []
@@ -70,7 +70,9 @@ class AnkiCrawler(object):
 
             if new_paths:
                 note[self.audio_field] = extend_audio_field(note[self.audio_field], new_paths, add_mode)
-            note.flush()
+            if do_flush:
+                # we can't flush inside of a thread, that's why we need to postpone flush sometimes
+                note.flush()
             # todo: return note? or something?
 
     # for batch/testing
