@@ -22,6 +22,12 @@ class RunMethodThread(QThread):
         self.terminate()
 
 
+def progress_bar_text(progress_bar):
+    current = progress_bar.value()
+    max = progress_bar.maximum()
+    return "{}/{} ({}%)".format(current, max, int(current/max))
+
+
 class MainThread(QThread):
     def __init__(self, crawler, mode, notes):
         QThread.__init__(self)
@@ -179,6 +185,8 @@ class MainGui(MainGuiNoAnki):
     def update_progress(self):
         self.progressBar.setEnabled(True)
         self.progressBar.setValue(self.main_thread.num)
+        print(progress_bar_text(self.progressBar))
+        self.progressBar.setFormat(progress_bar_text(self.progressBar))
         self.tableWidget.setEnabled(True)
         keys_in_order = ["total_notes", "total_audio_files", "missing_audio", "newly_downloaded", "failed_to_download"]
         for row, key in enumerate(keys_in_order):
