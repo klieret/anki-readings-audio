@@ -20,7 +20,7 @@ class AddMode(object):
         for option in self.option_names:
             if self.__getattribute__(option) is None:
                 raise ValueError
-        if self.add_mode not in ["extend", "overwrite", "overwrite_empty"]:
+        if self.mode not in ["extend", "overwrite", "overwrite_empty"]:
             raise ValueError
 
 class DownloadMode(object):

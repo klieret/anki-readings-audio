@@ -100,9 +100,15 @@ class MainGui(QtGui.QWidget, gui_download_design.Ui_crawler_dialog):
         for check_box in self.download_dependant_boxes:
             check_box.setEnabled(self.checkBox_download_missing.isChecked())
 
+def demo_run():
+    print("1")
+    mg = MainGui()
+    print("2")
+    mg.show()
+    print("3")
+
 if __name__ == '__main__':
     # for testing purposes
     app = QtGui.QApplication(sys.argv)
-    mg = MainGui()
-    mg.show()
+    demo_run()
     app.exec_()

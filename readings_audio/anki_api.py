@@ -85,8 +85,8 @@ class ReadingsAudio(object):
             mode = CrawlingMode(add_mode, download_mode)
             mode.check_options()
             self.process_single(note, mode)
-            # if num >= 10:
-            #     # todo: remove; for testing only
-            #     break
+            if num >= 10:
+                # todo: remove; for testing only
+                break
 
         print(self.missing_audio)
