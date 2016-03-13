@@ -32,7 +32,7 @@ def get_paths_from_audio_field(audio_field):
     return regex.findall(audio_field)
 
 
-def extend_audio_field(old_audio_field, new_paths, do_remove_duplicates=True, new_entries_first=False, overwrite=False):
+def extend_audio_field(old_audio_field, new_paths, mode):
     """ Takes the content of an audio field and extends it with paths for more audio files.
     Furthermore:
     1. Any text in between audio field entries is removed
@@ -41,14 +41,15 @@ def extend_audio_field(old_audio_field, new_paths, do_remove_duplicates=True, ne
     4. The entries from old_audio field are completely neglected if overwrite == True
     :param old_audio_field: The content of the old audio field.
     :param new_paths: Paths to audio files that we want to add to the audio field.
-    :param do_remove_duplicates: Do we want to remove duplicate entries?
-    :param new_entries_first: Should the new entries (possibly with removed duplicates)
-    :param overwrite: completely ignore old_audio_field
+    :param mode: AddMode Containing options
     :return: New string for the audio field
     """
-    print(new_paths)
-    if overwrite:
-        old_audio_field = ""
+
+    if not mode.enabled:
+        raise ValueError
+
+    if mode.remove_broken:
+        raise NotImplementedError
 
     # convert both inputs to lists of strings [sound:....]
     old_paths = get_paths_from_audio_field(old_audio_field)
@@ -56,26 +57,25 @@ def extend_audio_field(old_audio_field, new_paths, do_remove_duplicates=True, ne
     # normalise paths
     new_paths = [os.path.normpath(path) for path in new_paths]
     old_paths = [os.path.normpath(path) for path in old_paths]
-    print(new_paths, old_paths)
 
     # remove duplicated paths:
-    if do_remove_duplicates:
-        # remove internal duplicates:
-        new_paths = remove_duplicates(new_paths)
-        old_paths = remove_duplicates(old_paths)
-        # remove intersection:
-        new_paths = remove_intersection(old_paths, new_paths)
-
-    print(new_paths, old_paths)
+    # 1. remove internal duplicates:
+    new_paths = remove_duplicates(new_paths)
+    old_paths = remove_duplicates(old_paths)
+    # 2. remove intersection:
+    new_paths = remove_intersection(old_paths, new_paths)
 
     # build audio field entries:
     new_audio_field_entries = [get_audio_field_entry_from_path(path) for path in new_paths]
     old_audio_field_entries = [get_audio_field_entry_from_path(path) for path in old_paths]
 
-    print(new_audio_field_entries, old_audio_field_entries)
+    if mode.mode == "overwrite_empty":
+        old_audio_field_entries = []
+    elif mode.mode == "overwrite" and new_audio_field_entries:
+        old_audio_field_entries = []
 
     # return them in right order:
-    if new_entries_first:
+    if mode.new_first:
         return ''.join(new_audio_field_entries) + ''.join(old_audio_field_entries)
     else:
         return ''.join(old_audio_field_entries) + ''.join(new_audio_field_entries)
