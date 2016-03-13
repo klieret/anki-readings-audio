@@ -24,6 +24,7 @@ class AudioCollection(object):
             media_dir = mw.col.media.dir()
         self.media_dir = media_dir
         self.content = collections.defaultdict(list)  # structure: syllable: [reading: [path1, path2,...]]
+        self.tmp_blacklist = set()
 
     @staticmethod
     def get_reading_from_name(path):
@@ -35,7 +36,8 @@ class AudioCollection(object):
         :return: (reading, number, max_number)
         """
         base = os.path.splitext(os.path.basename(path))[0]
-        if not base.startswith("raudio_"):
+        # todo: better solution thatn this hack to incorporate own readings (with less priority)
+        if not base.startswith("raudio_") or base.startswith("saudio_"):
             raise ValueError
         # of course throws an exception if more than 1 '_' left
         # (feature not a bug)
@@ -81,12 +83,16 @@ class AudioCollection(object):
 
     def download(self, reading):
         # return number of downloaded items
+        if reading in self.tmp_blacklist:
+            logger.debug("Skipping {}. tmp blacklist.".fomrat(reading))
+            return 0
         logger.debug(u"Dl: Downloading {}".format(reading))
         try:
             dl_entries = get_audio_entries(reading)
         except:
             e = sys.exc_info()[0]
             logger.warning(u"Failed to download: {}".format(e))
+            self.tmp_blacklist.add(reading)
             traceback.print_exc()
             return 0
         name_list = self.dupe_proof_names(dl_entries, reading)

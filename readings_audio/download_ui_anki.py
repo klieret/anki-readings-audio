@@ -33,13 +33,13 @@ class MainThread(QThread):
     def run(self):
         for num, note in enumerate(self.notes):
             print("note", num)
+            self.num = num
             self.crawler.update_statistics()
             readings = self.crawler.process_readings(note)
             self.crawler.process_download(readings, self.mode.download)
             # flush must happen outside of threading
             self.crawler.process_add(note, readings, self.mode.add, do_flush = False)
             self.crawler.update_statistics()
-            time.sleep(1)
             self.emit(SIGNAL("update_progress()"))
         self.terminate()
 
@@ -56,7 +56,7 @@ class MainGui(MainGuiNoAnki):
         add_mode.set_defaults()
         download_mode = DownloadMode()
         download_mode.set_defaults()
-        download_mode.enabled = False
+        download_mode.enabled = True
         mode = CrawlingMode(add_mode, download_mode)
         mode.check_options()
         return mode
@@ -177,6 +177,7 @@ class MainGui(MainGuiNoAnki):
         #     self.progressBar.reset()
 
     def update_progress(self):
+        self.progressBar.setEnabled(True)
         self.progressBar.setValue(self.main_thread.num)
         self.tableWidget.setEnabled(True)
         keys_in_order = ["total_notes", "total_audio_files", "missing_audio", "newly_downloaded", "failed_to_download"]
