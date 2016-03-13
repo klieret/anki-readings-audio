@@ -79,9 +79,9 @@ class ReadingsAudio(object):
             card = mw.col.getCard(nid)
             note = card.note()
             # todo: carefull overwrite!
-            self.process_single(note, download=True, add=True, overwrite=False)
-            if num >= 10:
-                # todo: remove; for testing only
-                break
+            self.process_single(note, download=True, add=True, overwrite=True)
+            # if num >= 10:
+            #     # todo: remove; for testing only
+            #     break
 
         print(self.missing_audio)

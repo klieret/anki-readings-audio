@@ -15,6 +15,7 @@ import traceback
 import logging
 logger = logging.getLogger("test")
 
+# todo: use unicode normalisation in some string  comparisons!
 
 class AudioCollection(object):
     def __init__(self, media_dir=None):
