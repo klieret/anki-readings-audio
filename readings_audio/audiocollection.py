@@ -77,7 +77,6 @@ class AudioCollection(object):
         # finally append the extension:
         for i in range(len(dl_entries)):
             name_list[i] += dl_entries[i].file_extension
-        print(name_list)
         return name_list
 
     def download(self, reading):
@@ -115,7 +114,6 @@ class AudioCollection(object):
                 continue
             else:
                 self.content[reading].append(file_name)
-                print(self.content[reading])
 
         logger.debug("Scan: #Elements after scan: {}".format(len(self.content)))
         logger.debug("Scan: Sorting audio collection items.")

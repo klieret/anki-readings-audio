@@ -19,7 +19,19 @@ sip.setapi('QSettings', 2)
 sip.setapi('QString', 2)
 from PyQt4 import QtGui, QtCore  # do not move these lines before the sip.setapi lines!
 import gui_download_design
+from PyQt4.QtCore import QThread, SIGNAL
 
+
+class Unsplittable(QThread):
+    def __init__(self, function, *args, **kwargs):
+        QThread.__init__(self)
+        self.function = function
+        self.args = args
+        self.kwargs = kwargs
+
+    def run(self):
+        self.function(*self.args, **self.kwargs)
+        self.terminate()
 
 
 class MainGuiNoAnki(QtGui.QWidget, gui_download_design.Ui_crawler_dialog):
@@ -52,27 +64,49 @@ class MainGuiNoAnki(QtGui.QWidget, gui_download_design.Ui_crawler_dialog):
             box.clicked.connect(self.box_implications)
 
         self.pushButton_start.clicked.connect(self.run)
+        self.pushButton_stop.clicked.connect(self.stop)
+        self.stop = False
+
+    def stop(self):
+        self.stop = True
 
     def run(self):
+        self.progressBar.setRange(0, 0)
+        self.thread = Unsplittable(time.sleep, 10)
+        self.connect(self.thread, SIGNAL("finished()"), self.unsplittable_finished)
+        self.thread.start()
+        # print "exited run"
+
+    def unsplittable_finished(self):
+        print "finished"
+        self.progressBar.setRange(0, 1)
+
+    def run_2(self):
+        self.stop = False # todo
         self.label_status.setText("Status: Running...")
 
         self.progressBar.setEnabled(True)
+        self.progressBar.setRange(0,1)
+
         self.tableWidget.setEnabled(True)
 
         self.pushButton_stop.setEnabled(True)
         self.pushButton_quit.setEnabled(False)
         self.pushButton_start.setEnabled(False)
 
-        self.progressBar.setMaximum(100)
-        for i in range(100):
-            self.label_status.setText("Status: {}".format(i))
-            self.progressBar.setValue(i)
-            item = QtGui.QTableWidgetItem(str(i))
-            item.setTextAlignment(QtCore.Qt.AlignRight)
-            self.tableWidget.setItem(0, 0, item)
-            if i == 3:
-                break
-            time.sleep(1)
+        # self.progressBar.setMaximum(100)
+        # for i in range(100):
+        #     if self.stop:
+        #         break  # todo
+        #     self.label_status.setText("Status: {}".format(i))
+        #     self.progressBar.setValue(i)
+        #     item = QtGui.QTableWidgetItem(str(i))
+        #     item.setTextAlignment(QtCore.Qt.AlignRight)
+        #     self.tableWidget.setItem(0, 0, item)
+        #     if i == 3:
+        #         break
+        #     time.sleep(1)
+
         self.label_status.setText("Status: Idle...")
 
         self.pushButton_stop.setEnabled(False)
@@ -90,6 +124,7 @@ class MainGuiNoAnki(QtGui.QWidget, gui_download_design.Ui_crawler_dialog):
         self.progressBar.setEnabled(False)
         self.progressBar.reset()
 
+
     def box_implications(self):
         for radio_button in self.add_dependant_boxes:
             radio_button.setEnabled(self.checkBox_add_media.isChecked())
@@ -102,9 +137,6 @@ class MainGuiNoAnki(QtGui.QWidget, gui_download_design.Ui_crawler_dialog):
         for check_box in self.download_dependant_boxes:
             check_box.setEnabled(self.checkBox_download_missing.isChecked())
 
-def demo_run():
-    mg = MainGuiNoAnki()
-    mg.show()
 
 if __name__ == '__main__':
     # for testing purposes

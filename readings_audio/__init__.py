@@ -12,7 +12,6 @@ from aqt import mw
 def run():
     mw.hDialog = MainGui()
     mw.hDialog.show()
-    print(dir(mw.hDialog))
     # ra = ReadingsAudio()
     # ra.process_all()
     # ra.try_downloading_audio()

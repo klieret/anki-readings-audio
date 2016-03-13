@@ -27,32 +27,26 @@ class AnkiCrawler(object):
         self.audio_field = "Audio"
         self.missing_audio = set()
         self.audio_collection = AudioCollection()
-        self.audio_collection.scan()
         # important: do include japanese version of ',' etc.!
         self.statistics = defaultdict(int)
-        self.update_statistics()
 
     def update_statistics(self):
         self.statistics["total_audio_files"] = len(self.audio_collection.content)
         self.statistics["missing_audio"] = len(self.missing_audio)
 
-    def process_single(self, note, mode):
-        """Processes single note.
-        :param note: The note.
-        :param mode: CrawlingMode object containing options.
-        :return:
-        """
-
+    def process_readings(self, note):
         # get readings from reading fields
         readings = []
         for field in self.reading_fields:
             if field in note.keys():
                 readings.extend(split_readings(note[field]))
+        return readings
 
+    def process_download(self, readings, dl_mode, no_download=False):
         # handle missing audio files
         for reading in readings:
             if reading not in self.audio_collection:
-                if mode.download.enabled:
+                if dl_mode.enabled and not no_download:
                     # todo: blacklisting?
                     num = self.audio_collection.download(reading)
                     self.statistics["newly_downloaded"] += num
@@ -64,8 +58,9 @@ class AnkiCrawler(object):
                     logger.debug("Reading {} is missing.".format(reading))
                     self.missing_audio.add(reading)
 
+    def process_add(self, note, readings, add_mode):
         # possibly add new audio files
-        if mode.add.enabled:
+        if add_mode.enabled:
             new_paths = []
             for reading in readings:
                 if reading in self.audio_collection and self.audio_collection[reading]:
@@ -74,33 +69,24 @@ class AnkiCrawler(object):
                     logger.debug(u"Extended with sound files {}".format(self.audio_collection[reading][0]))
 
             if new_paths:
-                note[self.audio_field] = extend_audio_field(note[self.audio_field], new_paths, mode.add)
+                note[self.audio_field] = extend_audio_field(note[self.audio_field], new_paths, add_mode)
             note.flush()
             # todo: return note? or something?
 
     # for batch/testing
-    def batch_process_all(self):
+    def batch_process_all(self, mode):
+        self.audio_collection.scan()
+        self.update_statistics()
         nids = []
         for deck in self.target_decks:
             nids += mw.col.findCards("deck:%s" % deck)
-        print "There's a total of %d notes." % len(nids)
-        self.statistics["total_notes"] = len(nids)
-
-        add_mode = AddMode()
-        add_mode.set_defaults()
-        download_mode = DownloadMode()
-        download_mode.set_defaults()
-        mode = CrawlingMode(add_mode, download_mode)
-        mode.check_options()
 
         for num, nid in enumerate(nids):
             card = mw.col.getCard(nid)
             note = card.note()
-            # todo: carefull overwrite!
-
-            self.process_single(note, mode)
-            if num >= 10:
-                # todo: remove; for testing only
-                break
+            readings = self.process_readings(note)
+            self.process_download(readings, mode.download)
+            self.process_add(note, readings, mode.add)
+            self.update_statistics()
 
         print(self.missing_audio)
