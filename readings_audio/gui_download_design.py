@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'gui_download_design.ui'
 #
-# Created: Sun Mar 13 12:26:45 2016
+# Created: Sun Mar 13 13:20:48 2016
 #      by: PyQt4 UI code generator 4.9.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -18,6 +18,9 @@ class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName(_fromUtf8("Dialog"))
         Dialog.resize(489, 594)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(_fromUtf8("icon.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        Dialog.setWindowIcon(icon)
         self.verticalLayout = QtGui.QVBoxLayout(Dialog)
         self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
         self.horizontalLayout_4 = QtGui.QHBoxLayout()
@@ -53,6 +56,7 @@ class Ui_Dialog(object):
         self.label_4.setObjectName(_fromUtf8("label_4"))
         self.verticalLayout.addWidget(self.label_4)
         self.checkBox_add_media = QtGui.QCheckBox(Dialog)
+        self.checkBox_add_media.setFocusPolicy(QtCore.Qt.StrongFocus)
         self.checkBox_add_media.setChecked(True)
         self.checkBox_add_media.setObjectName(_fromUtf8("checkBox_add_media"))
         self.verticalLayout.addWidget(self.checkBox_add_media)
@@ -148,7 +152,9 @@ class Ui_Dialog(object):
         self.label_status.setObjectName(_fromUtf8("label_status"))
         self.verticalLayout.addWidget(self.label_status)
         self.progressBar = QtGui.QProgressBar(Dialog)
-        self.progressBar.setProperty("value", 24)
+        self.progressBar.setEnabled(False)
+        self.progressBar.setProperty("value", 0)
+        self.progressBar.setTextVisible(True)
         self.progressBar.setObjectName(_fromUtf8("progressBar"))
         self.verticalLayout.addWidget(self.progressBar)
         self.line_4 = QtGui.QFrame(Dialog)
@@ -161,6 +167,7 @@ class Ui_Dialog(object):
         spacerItem2 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.horizontalLayout.addItem(spacerItem2)
         self.pushButton_quit = QtGui.QPushButton(Dialog)
+        self.pushButton_quit.setAutoDefault(False)
         self.pushButton_quit.setFlat(False)
         self.pushButton_quit.setObjectName(_fromUtf8("pushButton_quit"))
         self.horizontalLayout.addWidget(self.pushButton_quit)
@@ -181,7 +188,7 @@ class Ui_Dialog(object):
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 
     def retranslateUi(self, Dialog):
-        Dialog.setWindowTitle(QtGui.QApplication.translate("Dialog", "Dialog", None, QtGui.QApplication.UnicodeUTF8))
+        Dialog.setWindowTitle(QtGui.QApplication.translate("Dialog", "Audio Downloader For Kanji Readings", None, QtGui.QApplication.UnicodeUTF8))
         self.label_2.setText(QtGui.QApplication.translate("Dialog", "<html><head/><body><p><span style=\" font-size:14pt; font-style:italic;\">Audio Downloader For Kanji Readings</span></p><p>Default values for below settings are displayed in parenthesis. Tooltips offer more information.</p></body></html>", None, QtGui.QApplication.UnicodeUTF8))
         self.label_4.setText(QtGui.QApplication.translate("Dialog", "<html><head/><body><p><span style=\" font-size:12pt;\">Settings</span></p></body></html>", None, QtGui.QApplication.UnicodeUTF8))
         self.checkBox_add_media.setToolTip(QtGui.QApplication.translate("Dialog", "<html><head/><body><p>Will modify the \'Audio\' field of the notes in the target deck to add audio files to the note.</p></body></html>", None, QtGui.QApplication.UnicodeUTF8))
@@ -214,16 +221,6 @@ class Ui_Dialog(object):
         item.setText(QtGui.QApplication.translate("Dialog", "Count", None, QtGui.QApplication.UnicodeUTF8))
         __sortingEnabled = self.tableWidget.isSortingEnabled()
         self.tableWidget.setSortingEnabled(False)
-        item = self.tableWidget.item(0, 0)
-        item.setText(QtGui.QApplication.translate("Dialog", "0", None, QtGui.QApplication.UnicodeUTF8))
-        item = self.tableWidget.item(1, 0)
-        item.setText(QtGui.QApplication.translate("Dialog", "0", None, QtGui.QApplication.UnicodeUTF8))
-        item = self.tableWidget.item(2, 0)
-        item.setText(QtGui.QApplication.translate("Dialog", "0", None, QtGui.QApplication.UnicodeUTF8))
-        item = self.tableWidget.item(3, 0)
-        item.setText(QtGui.QApplication.translate("Dialog", "0", None, QtGui.QApplication.UnicodeUTF8))
-        item = self.tableWidget.item(4, 0)
-        item.setText(QtGui.QApplication.translate("Dialog", "0", None, QtGui.QApplication.UnicodeUTF8))
         self.tableWidget.setSortingEnabled(__sortingEnabled)
         self.label_status.setText(QtGui.QApplication.translate("Dialog", "Status: Idle", None, QtGui.QApplication.UnicodeUTF8))
         self.pushButton_quit.setText(QtGui.QApplication.translate("Dialog", "Quit", None, QtGui.QApplication.UnicodeUTF8))

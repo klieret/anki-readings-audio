@@ -11,7 +11,11 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Audio Downloader For Kanji Readings</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>icon.png</normaloff>icon.png</iconset>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -72,6 +76,9 @@
    </item>
    <item>
     <widget class="QCheckBox" name="checkBox_add_media">
+     <property name="focusPolicy">
+      <enum>Qt::StrongFocus</enum>
+     </property>
      <property name="toolTip">
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Will modify the 'Audio' field of the notes in the target deck to add audio files to the note.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
@@ -295,27 +302,27 @@
      </column>
      <item row="0" column="0">
       <property name="text">
-       <string>0</string>
+       <string/>
       </property>
      </item>
      <item row="1" column="0">
       <property name="text">
-       <string>0</string>
+       <string/>
       </property>
      </item>
      <item row="2" column="0">
       <property name="text">
-       <string>0</string>
+       <string/>
       </property>
      </item>
      <item row="3" column="0">
       <property name="text">
-       <string>0</string>
+       <string/>
       </property>
      </item>
      <item row="4" column="0">
       <property name="text">
-       <string>0</string>
+       <string/>
       </property>
      </item>
     </widget>
@@ -329,8 +336,14 @@
    </item>
    <item>
     <widget class="QProgressBar" name="progressBar">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="value">
-      <number>24</number>
+      <number>0</number>
+     </property>
+     <property name="textVisible">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
@@ -360,6 +373,9 @@
       <widget class="QPushButton" name="pushButton_quit">
        <property name="text">
         <string>Quit</string>
+       </property>
+       <property name="autoDefault">
+        <bool>false</bool>
        </property>
        <property name="flat">
         <bool>false</bool>
