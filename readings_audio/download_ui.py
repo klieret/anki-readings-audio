@@ -5,6 +5,7 @@
 import sys
 import time
 
+# todo: in which file should that go, do I really need that?
 import sip
 # Depending on the API, the QtCore.Qsettings object acts differently:
 # Suppose settings=QtCore.QSettings(....), then
@@ -21,9 +22,10 @@ import gui_download_design
 
 
 
-class MainGui(QtGui.QWidget, gui_download_design.Ui_crawler_dialog):
+class MainGuiNoAnki(QtGui.QWidget, gui_download_design.Ui_crawler_dialog):
     def __init__(self):
-        super(self.__class__, self).__init__()
+        print("This is MainGuiNoAnki. init for {}".format(super(self.__class__, self)))
+        super(MainGuiNoAnki, self).__init__()
         self.setupUi(self)
 
         # Names ...................
@@ -49,9 +51,9 @@ class MainGui(QtGui.QWidget, gui_download_design.Ui_crawler_dialog):
         for box in self.all_boxes:
             box.clicked.connect(self.box_implications)
 
-        self.pushButton_start.clicked.connect(self.mock_loop)
+        self.pushButton_start.clicked.connect(self.run)
 
-    def mock_loop(self):
+    def run(self):
         self.label_status.setText("Status: Running...")
 
         self.progressBar.setEnabled(True)
@@ -67,7 +69,7 @@ class MainGui(QtGui.QWidget, gui_download_design.Ui_crawler_dialog):
             self.progressBar.setValue(i)
             item = QtGui.QTableWidgetItem(str(i))
             item.setTextAlignment(QtCore.Qt.AlignRight)
-            self.tableWidget.setItem(2,2, item)
+            self.tableWidget.setItem(0, 0, item)
             if i == 3:
                 break
             time.sleep(1)
@@ -101,14 +103,12 @@ class MainGui(QtGui.QWidget, gui_download_design.Ui_crawler_dialog):
             check_box.setEnabled(self.checkBox_download_missing.isChecked())
 
 def demo_run():
-    print("1")
-    mg = MainGui()
-    print("2")
+    mg = MainGuiNoAnki()
     mg.show()
-    print("3")
 
 if __name__ == '__main__':
     # for testing purposes
     app = QtGui.QApplication(sys.argv)
-    demo_run()
+    mg = MainGuiNoAnki()
+    mg.show()
     app.exec_()

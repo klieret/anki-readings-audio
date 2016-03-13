@@ -4,14 +4,15 @@
 from anki.hooks import addHook
 from aqt.qt import QAction, SIGNAL
 
-from .anki_api import ReadingsAudio
-from .download_ui import *
+from .anki_api import AnkiCrawler
+from .download_ui_anki import *
 from aqt import mw
 
 
 def run():
     mw.hDialog = MainGui()
     mw.hDialog.show()
+    print(dir(mw.hDialog))
     # ra = ReadingsAudio()
     # ra.process_all()
     # ra.try_downloading_audio()
