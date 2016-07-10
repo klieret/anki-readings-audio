@@ -11,11 +11,16 @@ from downloader_api import get_audio_entries
 from collections import defaultdict
 import traceback
 
-# todo: not so good style
+# todo: format logger
 import logging
 logger = logging.getLogger("test")
 
 # todo: use unicode normalisation in some string  comparisons!
+# todo: implement proper blacklist
+# todo: option to skip the blacklist of audiodownloader
+# todo: pickle stuff/save configuration
+# todo: create database of downloaded entries for later filtering
+# todo: backups
 
 class AudioCollection(object):
     def __init__(self, media_dir=None):
