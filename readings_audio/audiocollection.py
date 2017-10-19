@@ -89,7 +89,7 @@ class AudioCollection(object):
     def download(self, reading):
         # return number of downloaded items
         if reading in self.tmp_blacklist:
-            logger.debug("Skipping {}. tmp blacklist.".fomrat(reading))
+            logger.debug("Skipping {}. tmp blacklist.".format(reading))
             return 0
         logger.debug(u"Dl: Downloading {}".format(reading))
         try:
