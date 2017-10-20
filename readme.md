@@ -12,3 +12,7 @@ Another add-on for Anki, mainly targeted at Japanese learners. The goal is to ad
 
 * Needs the ```python2``` ```romkan``` module, e.g. available [here](https://pypi.python.org/pypi/romkan), or via installation with ```pip``` or ```easy_install```.
 * Needs the [Download Audio plug-in](https://ankiweb.net/shared/info/3100585138)
+
+## License
+
+The contents of this repository are licensed under the [*AGPL3* license](https://choosealicense.com/licenses/agpl-3.0/) (to be compatible with the license of Anki and its addons as detailed [here](https://ankiweb.net/account/terms)).
