@@ -9,5 +9,5 @@ else
 	exit 1
 fi
 
-cp readings_audio.py $addon_dir
+cp *.py $addon_dir
 cp -r readings_audio $addon_dir
