@@ -1,5 +1,7 @@
 # Readings Audio
 
+**[Overview over my other Anki add-ons](http://www.lieret.net/opensource/#anki)**
+
 Another add-on for Anki, mainly targeted at Japanese learners. The goal is to add audio to Kanji vocabulary cards corresponding to On- and Kunyomi readings. The idea of this plug-in was to mainly get those readings via the [Download Audio plug-in](https://ankiweb.net/shared/info/3100585138), however it turned out that not all possible readings could be found there, so that this resource needs to be completed by recordings of missing readings (which is something I haven't done so far).
 
 ![readings audio](https://raw.githubusercontent.com/klieret/readme-files/master/anki-readings-audio/readings_audio_ui.png)
